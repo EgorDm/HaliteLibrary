@@ -51,13 +51,13 @@ namespace mapgen {
         std::mt19937 rng;
 
     public:
-        Generator(unsigned int _seed);
+        explicit Generator(unsigned int _seed);
 
         /**
          * Get the name of this map generator.
          * @return
          */
-        virtual auto name() -> std::string = 0;
+        virtual std::string name() = 0;
 
         /**
          * Given a map, fill it with planets and initial ships.
@@ -66,10 +66,7 @@ namespace mapgen {
          * @param num_players The number of players on the map.
          * @param effective_players The number of players to generate the map for.
          */
-        virtual auto generate(
-            hlt::Map& map,
-            unsigned int num_players,
-            unsigned int effective_players) -> std::vector<PointOfInterest> = 0;
+        virtual std::vector<PointOfInterest> generate(hlt::Map& map, unsigned int num_players) = 0;
     };
 
     auto to_json(nlohmann::json& json, const PointOfInterest& poi) -> void;

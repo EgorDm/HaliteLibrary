@@ -1,4 +1,5 @@
 #include "SolarSystem.hpp"
+#include "../../../../../cygwin64/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/functional"
 
 #include <functional>
 
@@ -12,19 +13,15 @@
 #endif
 
 namespace mapgen {
-    SolarSystem::SolarSystem(unsigned int _seed)
-        : Generator(_seed) {}
+    SolarSystem::SolarSystem(unsigned int _seed) : Generator(_seed) {}
 
     auto SolarSystem::generate(
         hlt::Map& map,
-        unsigned int num_players,
-        unsigned int effective_players) -> std::vector<PointOfInterest> {
-        assert(effective_players == 2 || effective_players == 4);
-        assert(num_players <= effective_players);
+        unsigned int num_players) -> std::vector<PointOfInterest> {
 
         auto spawn_zones = std::vector<Zone>();
 
-        if (effective_players == 2) {
+        if (num_players == 2) {
             auto prefer_horizontal = rng() % 2 == 0;
 
             if (prefer_horizontal) {
@@ -75,7 +72,7 @@ namespace mapgen {
 
         const auto planets_per_player =
             hlt::GameConstants::get().PLANETS_PER_PLAYER;
-        const auto total_planets = effective_players * planets_per_player;
+        const auto total_planets = num_players * planets_per_player;
         auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
         const auto center_x = map.map_width / 2.0;
         const auto center_y = map.map_height / 2.0;

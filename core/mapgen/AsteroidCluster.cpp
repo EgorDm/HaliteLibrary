@@ -16,8 +16,7 @@ namespace mapgen {
 
     auto AsteroidCluster::generate(
         hlt::Map& map,
-        unsigned int num_players,
-        unsigned int effective_players) -> std::vector<PointOfInterest> {
+        unsigned int num_players) -> std::vector<PointOfInterest> {
 
         auto extra_planets = hlt::GameConstants::get().EXTRA_PLANETS;
         const auto center_x = map.map_width / 2.0;
@@ -31,9 +30,9 @@ namespace mapgen {
         auto spawn_zones = std::vector<Zone>();
 
         auto spawn_angle_offset = rand_angle();
-        const auto spawn_angle_step = 2 * M_PI / effective_players;
+        const auto spawn_angle_step = 2 * M_PI / num_players;
         const auto spawn_radius = std::min(map.map_width, map.map_height) / 2.0;
-        for (int player_idx = 0; player_idx < effective_players;
+        for (int player_idx = 0; player_idx < num_players;
              player_idx++) {
             spawn_zones.emplace_back(
                 hlt::Location{

@@ -10,8 +10,7 @@ namespace mapgen {
 
         auto generate(
             hlt::Map& map,
-            unsigned int num_players,
-            unsigned int effective_players) -> std::vector<PointOfInterest>;
+            unsigned int num_players) -> std::vector<PointOfInterest>;
 
         auto name() -> std::string;
     };
