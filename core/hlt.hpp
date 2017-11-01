@@ -48,6 +48,29 @@ namespace hlt {
         auto output_json(hlt::PlayerId player_id, int move_no) const -> nlohmann::json;
     };
 
+    struct ShipMove {
+        MoveType type;
+        EntityIndex shipId;
+
+        unsigned short thrust;
+        unsigned short angle;
+        EntityIndex dock_to;
+
+        Move get_move() {
+            Move move{};
+            move.type = type;
+            move.shipId = shipId;
+            if(type == hlt::MoveType::Thrust) {
+                move.move.thrust.thrust = thrust;
+                move.move.thrust.angle = angle;
+            } else if(type == hlt::MoveType::Dock) {
+                move.move.dock_to = dock_to;
+            }
+
+            return move;
+        }
+    };
+
     template<typename T>
     using entity_map = std::unordered_map<EntityIndex, T>;
 

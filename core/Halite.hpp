@@ -118,7 +118,7 @@ private:
 public:
     Halite(unsigned short width_, unsigned short height_, unsigned int seed_, const std::vector<std::string> &players_);
 
-    void do_move(unsigned int player_id, const hlt::entity_map<hlt::Move> &moves);
+    void do_move(unsigned int player_id, const hlt::entity_map<hlt::ShipMove> &moves);
 
     void step();
 
@@ -130,7 +130,7 @@ public:
 
     std::string get_name(hlt::PlayerId player_tag);
 
-    const hlt::Map &getMap() const;
+    const hlt::Map &get_map() const;
 
     const hlt::GameConstants &get_constants() const;
 };

@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     std::vector<std::string> players = {"Orion", "Proxima"};
     auto game = new Halite(300, 200, 123, players);
 
-    std::cout << game->getMap().ships.at(0).at(0).location << std::endl;
+    std::cout << game->get_map().ships.at(0).at(0).location << std::endl;
 
     hlt::Move move{};
     move.type = hlt::MoveType::Thrust;
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     game->do_move(0, moves);
 
     game->step();
-    std::cout << game->getMap().ships.at(0).at(0).location << std::endl;
+    std::cout << game->get_map().ships.at(0).at(0).location << std::endl;
 
     game->save_replay(R"(D:\Developent\CPP\HalieEnv\testrep.rep)");
 

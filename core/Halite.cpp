@@ -436,7 +436,6 @@ auto Halite::process_moves(std::vector<bool> &alive, int move_no) -> Simultaneou
                     if (ship.docking_status != hlt::DockingStatus::Undocked) {
                         break;
                     }
-
                     auto angle = move.move.thrust.angle * M_PI / 180.0;
                     ship.velocity.accelerate_by(move.move.thrust.thrust, angle);
                     break;
@@ -828,7 +827,8 @@ std::string Halite::get_name(hlt::PlayerId player_tag) {
     return players[player_tag];
 }
 
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, const std::vector<std::string> &players_) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_,
+               const std::vector<std::string> &players_) {
     auto generator = mapgen::SolarSystem(seed_);
     generator_name = generator.name();
     seed = seed_;
@@ -939,11 +939,18 @@ void Halite::finish() {
     std::reverse(rankings.begin(), rankings.end());
 }
 
-void Halite::do_move(unsigned int player_id, const hlt::entity_map<hlt::Move> &moves) {
-    player_moves.at(player_id)[0] = moves;
+void Halite::do_move(unsigned int player_id, const hlt::entity_map<hlt::ShipMove> &moves) {
+    hlt::entity_map<hlt::Move> _moves;
+    for (auto &pair : moves) {
+        const auto ship_idx = pair.first;
+        auto move = pair.second;
+        _moves.insert(std::make_pair(ship_idx, move.get_move()));
+    }
+
+    player_moves.at(player_id)[0] = _moves;
 }
 
-const hlt::Map &Halite::getMap() const {
+const hlt::Map &Halite::get_map() const {
     return game_map;
 }
 
@@ -982,7 +989,7 @@ void Halite::save_replay(std::string filepath) {
     try {
         replay.output(stats.output_filename);
     }
-    catch (std::runtime_error& e) {
+    catch (std::runtime_error &e) {
         stats.output_filename = filepath;
         replay.output(stats.output_filename);
     }
