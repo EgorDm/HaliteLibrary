@@ -828,10 +828,7 @@ std::string Halite::get_name(hlt::PlayerId player_tag) {
     return players[player_tag];
 }
 
-Halite::~Halite() = default;
-
-Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_,
-               const std::vector<std::string> &players_) {
+Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_, const std::vector<std::string> &players_) {
     auto generator = mapgen::SolarSystem(seed_);
     generator_name = generator.name();
     seed = seed_;

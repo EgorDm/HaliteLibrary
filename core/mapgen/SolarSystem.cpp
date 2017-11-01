@@ -1,5 +1,4 @@
 #include "SolarSystem.hpp"
-#include "../../../../../cygwin64/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/functional"
 
 #include <functional>
 

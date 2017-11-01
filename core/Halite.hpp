@@ -27,7 +27,6 @@
 #include "GameEvent.hpp"
 #include "Statistics.hpp"
 #include "mapgen/Generator.hpp"
-#include "../networking/Networking.hpp"
 
 extern bool quiet_output;
 extern bool always_log;
@@ -134,8 +133,6 @@ public:
     const hlt::Map &getMap() const;
 
     const hlt::GameConstants &getConstants() const;
-
-    ~Halite();
 };
 
 #endif
