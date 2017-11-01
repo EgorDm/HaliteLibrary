@@ -184,7 +184,7 @@ void Halite::kill_player(hlt::PlayerId player) {
 
 auto Halite::process_docking() -> void {
     // Update docking/undocking status
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
         auto &player_ships = game_map.ships.at(player_id);
         for (auto &pair : player_ships) {
             const auto &ship_idx = pair.first;
@@ -412,7 +412,7 @@ auto Halite::process_moves(std::vector<bool> &alive, int move_no) -> Simultaneou
     // Keep track of which ships docked simultaneously
     SimultaneousDockMap simulataneous_docking;
 
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
         if (!alive[player_id]) {
             continue;
         }
@@ -472,12 +472,12 @@ auto Halite::process_moves(std::vector<bool> &alive, int move_no) -> Simultaneou
 }
 
 auto Halite::find_living_players() -> std::vector<bool> {
-    std::vector<bool> still_alive(player_names.size(), false);
+    std::vector<bool> still_alive(players.size(), false);
     std::fill(last_ship_count.begin(), last_ship_count.end(), 0);
-    std::vector<int> owned_planets(player_names.size(), 0);
+    std::vector<int> owned_planets(players.size(), 0);
     auto total_planets = 0;
 
-    for (hlt::PlayerId player = 0; player < player_names.size(); player++) {
+    for (hlt::PlayerId player = 0; player < players.size(); player++) {
         for (const auto &pair : game_map.ships.at(player)) {
             still_alive[player] = true;
             last_ship_count[player]++;
@@ -507,7 +507,7 @@ auto Halite::find_living_players() -> std::vector<bool> {
             // End the game by "killing off" the other players
             std::fill(still_alive.begin(), still_alive.end(), false);
             // If there's only one player, let the game end
-            if (player_names.size() > 1) {
+            if (players.size() > 1) {
                 still_alive[player_id] = true;
             }
         }
@@ -527,7 +527,7 @@ auto Halite::process_events() -> void {
     CollisionMap collision_map = CollisionMap(game_map, event_horizon);
     std::vector<hlt::EntityId> potential_collisions;
 
-    for (hlt::PlayerId player1 = 0; player1 < player_names.size(); player1++) {
+    for (hlt::PlayerId player1 = 0; player1 < players.size(); player1++) {
         for (const auto &pair1 : game_map.ships.at(player1)) {
             const auto &id1 = hlt::EntityId::for_ship(player1, pair1.first);
             const auto &ship1 = pair1.second;
@@ -731,7 +731,7 @@ auto Halite::process_events() -> void {
 }
 
 auto Halite::process_damage(DamageMap &ship_damage, double time) -> void {
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
         const auto player_damage = ship_damage[player_id];
 
         for (const auto &pair : player_damage) {
@@ -745,7 +745,7 @@ auto Halite::process_damage(DamageMap &ship_damage, double time) -> void {
 }
 
 auto Halite::process_movement() -> void {
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size();
+    for (hlt::PlayerId player_id = 0; player_id < players.size();
          player_id++) {
         for (auto &ship_pair : game_map.ships.at(player_id)) {
             auto &ship = ship_pair.second;
@@ -825,7 +825,7 @@ auto Halite::process_dock_fighting(SimultaneousDockMap simultaneous_docking) -> 
  */
 
 std::string Halite::get_name(hlt::PlayerId player_tag) {
-    return player_names[player_tag];
+    return players[player_tag];
 }
 
 Halite::~Halite() = default;
@@ -833,16 +833,17 @@ Halite::~Halite() = default;
 Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_,
                const std::vector<std::string> &players_) {
     auto generator = mapgen::SolarSystem(seed_);
+    generator_name = generator.name();
     seed = seed_;
     game_map = hlt::Map(width_, height_);
-    points_of_interest = generator.generate(game_map, players_.size());
+    points_of_interest = generator.generate(game_map, static_cast<unsigned int>(players_.size()));
     constants = hlt::GameConstants::get();
     max_turn_number = std::min(constants.MAX_TURNS, 100U + (int) (sqrt(game_map.map_width * game_map.map_height)));
 
     // Default initialize
     player_moves = {{{{}}}};
     turn_number = 0;
-    player_names = players_;
+    players = players_;
 
     // Add to full game:
     full_frames.push_back({hlt::Map(game_map)});
@@ -869,15 +870,15 @@ Halite::Halite(unsigned short width_, unsigned short height_, unsigned int seed_
 bool Halite::game_ended() {
     const auto num_living_players = std::count(living_players.begin(), living_players.end(), true);
     return turn_number >= max_turn_number ||
-           (num_living_players <= 1 && player_names.size() > 1) ||
-           (num_living_players == 0 && player_names.size() == 1);
+           (num_living_players <= 1 && players.size() > 1) ||
+           (num_living_players == 0 && players.size() == 1);
 }
 
 void Halite::step() {
     auto alive = find_living_players();
 
     // Update alive frame counts
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++)
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++)
         if (alive[player_id]) alive_frame_count[player_id]++;
 
     full_frame_events.emplace_back();
@@ -898,8 +899,8 @@ void Halite::step() {
     process_cooldowns();
 
     // Clear moves for next step
-    for (auto& row : player_moves) {
-        for (auto& subrow : row) {
+    for (auto &row : player_moves) {
+        for (auto &subrow : row) {
             subrow.clear();
         }
     }
@@ -911,7 +912,7 @@ void Halite::step() {
 
     // Add to vector of players that should be dead.
     std::vector<hlt::PlayerId> new_rankings;
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
         if (living_players[player_id] && !alive[player_id]) {
             new_rankings.push_back(player_id);
         }
@@ -923,14 +924,14 @@ void Halite::step() {
     std::stable_sort(new_rankings.begin(), new_rankings.end(), comparator);
     rankings.insert(rankings.end(), new_rankings.begin(), new_rankings.end());
 
-    if(game_ended()) finish();
+    if (game_ended()) finish();
 }
 
 void Halite::finish() {
     // Add remaining players to the ranking. Break ties using the same
     // comparison function.
     std::vector<hlt::PlayerId> new_rankings;
-    for (hlt::PlayerId player_id = 0; player_id < player_names.size(); player_id++) {
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
         if (living_players[player_id]) new_rankings.push_back(player_id);
     }
     std::shuffle(new_rankings.begin(), new_rankings.end(), rng);
@@ -943,7 +944,6 @@ void Halite::finish() {
 
 void Halite::do_move(unsigned int player_id, const hlt::entity_map<hlt::Move> &moves) {
     player_moves.at(player_id)[0] = moves;
-    //player_moves[0] = moves;
 }
 
 const hlt::Map &Halite::getMap() const {
@@ -952,4 +952,41 @@ const hlt::Map &Halite::getMap() const {
 
 const hlt::GameConstants &Halite::getConstants() const {
     return constants;
+}
+
+void Halite::save_replay(std::string filepath) {
+    GameStatistics stats = GameStatistics();
+    for (hlt::PlayerId player_id = 0; player_id < players.size(); player_id++) {
+        PlayerStatistics p{};
+        p.tag = player_id;
+        p.rank = static_cast<int>(
+                std::distance(rankings.begin(), std::find(rankings.begin(), rankings.end(), player_id)) + 1);
+        // alive_frame_count counts frames, but the frames are 0-base indexed (at least in the visualizer), so everyone needs -1 to find the frame # where last_alive
+        // however, the first place player and 2nd place player always have the same reported alive_frame_count (not sure why)
+        // it turns out to make "last_frame_alive" match what is seen in replayer, we have to -2 from all but finishers who are alive in last frame of game who only need -1
+        p.last_frame_alive = alive_frame_count[player_id] - 2 + living_players[player_id];
+        p.init_response_time = -1;
+        p.average_frame_response_time = -1; //In milliseconds.
+        p.total_ship_count = total_ship_count[player_id];
+        p.damage_dealt = damage_dealt[player_id];
+        stats.player_statistics.push_back(p);
+    }
+
+    Replay replay = {
+            stats,
+            static_cast<unsigned short>(players.size()),
+            players,
+            seed, generator_name, points_of_interest,
+            game_map.map_width, game_map.map_height,
+            full_frames, full_frame_events, full_player_moves,
+    };
+
+    stats.output_filename = filepath;
+    try {
+        replay.output(stats.output_filename);
+    }
+    catch (std::runtime_error& e) {
+        stats.output_filename = filepath;
+        replay.output(stats.output_filename);
+    }
 }

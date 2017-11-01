@@ -19,6 +19,7 @@
 #include <iostream>
 #include <thread>
 #include <future>
+#include <mapgen/SolarSystem.hpp>
 
 #include "json.hpp"
 
@@ -41,9 +42,10 @@ private:
     unsigned int max_turn_number;
     unsigned short turn_number;
     hlt::Map game_map;
-    std::vector<std::string> player_names;
+    std::vector<std::string> players;
     hlt::MoveQueue player_moves;
     hlt::GameConstants constants;
+    std::string generator_name;
 
     unsigned int seed;
     std::mt19937 rng;
@@ -124,6 +126,8 @@ public:
     void finish();
 
     bool game_ended();
+
+    void save_replay(std::string filepath);
 
     std::string get_name(hlt::PlayerId player_tag);
 

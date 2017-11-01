@@ -29,4 +29,9 @@ int main(int argc, char **argv) {
 
     game->step();
     std::cout << game->getMap().ships.at(0).at(0).location << std::endl;
+
+    game->save_replay(R"(D:\Developent\CPP\HalieEnv\testrep.rep)");
+
+    delete game;
+
 }
