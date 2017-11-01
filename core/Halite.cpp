@@ -947,7 +947,7 @@ const hlt::Map &Halite::getMap() const {
     return game_map;
 }
 
-const hlt::GameConstants &Halite::getConstants() const {
+const hlt::GameConstants &Halite::get_constants() const {
     return constants;
 }
 

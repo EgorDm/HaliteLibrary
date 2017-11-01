@@ -132,7 +132,7 @@ public:
 
     const hlt::Map &getMap() const;
 
-    const hlt::GameConstants &getConstants() const;
+    const hlt::GameConstants &get_constants() const;
 };
 
 #endif
